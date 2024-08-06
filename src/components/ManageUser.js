@@ -49,14 +49,18 @@ const ManageUser = () => {
   const closeModal2 = () => {
     setActiveModal(null);
   };
+
+  console.log(partner_id, 'dsfsdf')
+
+  const pid = partner_id;
   const fetchData = async () => {
     const endpoint =
       manage === "구독"
-        ? "back/api/partner/r_list"
-        : "back/api/partner/booking_list";
+        ? "/back/api/partner/r_list"
+        : "/back/api/partner/booking_list";
     try {
       const response = await axios.get(endpoint, {
-        params: { partner_id },
+        params: { pid },
       });
       if (manage === "구독") {
         const data = response.data.subscriptions;
@@ -68,7 +72,7 @@ const ManageUser = () => {
         console.log("예약 리스트: ", data);
       }
     } catch (err) {
-      console.log(err);
+      console.log(err, '123123122');
     }
   };
   useEffect(() => {
@@ -110,7 +114,7 @@ const ManageUser = () => {
       });
       console.log("횟수 추가: ", response.data);
     } catch (e) {
-      console.log(e);
+      console.log(e, '123123');
     }
   };
   return (
@@ -181,10 +185,10 @@ const ManageUser = () => {
                     style={
                       check[index]
                         ? {
-                            backgroundColor: "white",
-                            color: "black",
-                            pointerEvents: "none",
-                          }
+                          backgroundColor: "white",
+                          color: "black",
+                          pointerEvents: "none",
+                        }
                         : null
                     }
                   >
@@ -198,50 +202,55 @@ const ManageUser = () => {
           <>
             <TabLine content="확정된 예약" />
             {bookUserList.map(
-              (v, index) =>
-                v.APPLY === 1 && (
-                  <div className={styles.WaitingReserv}>
-                    <div className={styles.WaitingReservInfo}>
-                      <span>{v.USER_NAME}</span>
-                      <span style={{ margin: "0 1rem 0 1.3rem" }}>/</span>
-                      <span>
-                        {v.YEAR}.{v.MONTH < 10 ? "0" : ""}
-                        {v.MONTH}.{v.DAY < 10 ? "0" : ""}
-                        {v.DAY} {v.TIME}
-                      </span>
+              (v, index) => {
+
+                console.log(v,'dddddfdfd');
+                return (
+                  v.APPLY === 1 && (
+                    <div className={styles.WaitingReserv}>
+                      <div className={styles.WaitingReservInfo}>
+                        <span>{v.USER_NAME}</span>
+                        <span style={{ margin: "0 1rem 0 1.3rem" }}>/</span>
+                        <span>
+                          {v.YEAR}.{v.MONTH < 10 ? "0" : ""}
+                          {v.MONTH}.{v.DAY < 10 ? "0" : ""}
+                          {v.DAY} {v.TIME}
+                        </span>
+                      </div>
+
+                      <div style={{ flexGrow: "1" }}></div>
+
+                      <div className={styles.ConfirmedReservInfoBtn}>
+
+                        <button
+                          onClick={() => {
+                            openModal2(true);
+                            setSelectmodal("상세보기");
+                          }}
+                        >
+                          상세보기
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            handleQuitReservationButton(v.BOOKID);
+                          }}
+                        >
+                          예약 취소
+                        </button>
+                      </div>
+                      <ReservUserModal
+                        activeModal={activeModal}
+                        closeModal2={closeModal2}
+                        selectmodal={selectmodal}
+                        completeReview={completeReview}
+                        completeSub={completeSub}
+                        bid={v.BOOKID}
+                      ></ReservUserModal>
                     </div>
-
-                    <div style={{ flexGrow: "1" }}></div>
-
-                    <div className={styles.ConfirmedReservInfoBtn}>
-                      <button
-                        onClick={() => {
-                          openModal2(true);
-                          setSelectmodal("상세보기");
-                        }}
-                      >
-                        상세보기
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          handleQuitReservationButton(v.BOOKID);
-                        }}
-                      >
-                        예약 취소
-                      </button>
-                    </div>
-                    <ReservUserModal
-                      activeModal={activeModal}
-                      closeModal2={closeModal2}
-                      selectmodal={selectmodal}
-                      completeReview={completeReview}
-                      completeSub={completeSub}
-                      bid={v.BOOKID}
-                    ></ReservUserModal>
-                  </div>
+                  )
                 )
-            )}
+              })}
 
             <TabLine content="대기 중인 예약" />
             {bookUserList.map(
